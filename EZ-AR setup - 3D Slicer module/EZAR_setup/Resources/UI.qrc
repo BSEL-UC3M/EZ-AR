@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="QRcode_Image">
+    <file>UI/QRcode_IGTweb.png</file>
+  </qresource>
+  <qresource prefix="Vuforia_Image">
+    <file>UI/2DMarker_IGT_DigitalImage.jpg</file>
+    <file>UI/2DMarker_IGT_Resized.jpg</file>
+  </qresource>
+</RCC>
