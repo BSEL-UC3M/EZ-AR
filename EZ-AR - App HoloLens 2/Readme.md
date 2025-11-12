@@ -8,7 +8,7 @@ To start, you must own a Microsoft HoloLens 2 headset configured in Developer Mo
 4. In the left hand side panel of the Windows Device Portal, click on Views > Apps. Within the Deploy Apps section, please click "Choose file" within the *Local storage* section:
 <p align="center"><img width="611" height="339" alt="image" src="https://github.com/user-attachments/assets/94e28672-011e-4536-be87-37906a36637d" />
 
-4. Select the appx file in the following path: "[...]\EZ-AR-main\EZ-AR - App HoloLens 2\EZ-AR_xx.xx.x.x_ARM64.appx".
+4. Select the appx or msix file in the following path: "[...]\EZ-AR-main\EZ-AR - App HoloLens 2\EZ-AR_xx.xx.x.x_ARM64.appx" or "[...]\EZ-AR-main\EZ-AR - App HoloLens 2\EZ-AR_xx.xx.x.x_ARM64.msix"
 5. You can find now your EZ-AR app in the app drawer of your device.
 6. Open the app by clicking in the icon. The first time you open it, please, grant permissions to access the eye tracker, microphone, camera and internal storage of your device.
 7. Your are all set!
