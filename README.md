@@ -15,6 +15,7 @@ The project was developed and tested using the following environment:
 | Game Engine | Unity 2021.3.20f1 LTS | Long-Term Support version used for development |
 | AR Framework | Mixed Reality Toolkit (MRTK) 2.7.3+ | Essential for interactions and user interface |
 | Language | C# | Main application logic |
+| 3D Slicer | 5.8.1 or above | Used to generate the configuration file with relevant information for the AR app |
 
 ## 📄 Scientific Publication and Citation
 
