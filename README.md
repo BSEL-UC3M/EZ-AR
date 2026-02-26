@@ -22,7 +22,7 @@ The project was developed and tested using the following environment:
 This repository complements the following paper: 
 - Title: EZ-AR: A universal AR application for multi-model visualization and real-time tracking in healthcare settings.
 - Authors: Alicia Pose-Díez-de-la-Lastra, Gemma Arce-Alonso, José-Antonio Calvo-Haro, Rubén Pérez-Mañanes, Javier Pascau.
-- Journal: [PENDING acceptance in Journal: Virtual Reality]
+- Journal: [PENDING]
 - DOI: [PENDING]
 Please cite our paper if you use this code or any part of this work in your projects or publications:
 
@@ -34,7 +34,7 @@ The repository is organized as follows:
 
 ## 🚀 Installation and Usage
 
-Please, follow the instructions in the following video to setup your own personalized AR app: [insert url to YouTube]
+Please, follow the instructions in the video SuppVideo-1_SeupInstruction.mp4 available at https://zenodo.org/records/18784073 to setup your own personalized AR app. In that repository you will also find a supplementary document with further instructions and details, as well as another video with sample use cases of the app.
 
 ## 📧 Contact
 
@@ -48,4 +48,4 @@ For more information about the research group, feel free to have a look at our w
 
 ## 🙏 Acknowledgements
 
-Research supported by projects TED2021-129392B-I00, TED2021-132200B-I00 and PID2023-149604OB-I00 (MCIU/AEI/10.13039/501100011033 and European Union “NextGenerationEU”/PRTR) and Comunidad de Madrid (MAGERIT-CM TEC-2024/COM-44 and Multiannual Agreement with UC3M SAFEDELIVERY-CM-UC3M).
+Research supported by Ministerio de Ciencia, Innovación y Universidades (MCIU/AEI/10.13039/501100011033) and the European Union “NextGenerationEU”/PRTR through projects TED2021-129392B-I00, TED2021-132200B-I00 and PID2023-149604OB-I00; by Comunidad de Madrid through project MAGERIT-CM TEC-2024/COM-44; by the Multiannual Agreement with UC3M through project SAFEDELIVERY-CM-UC3M; and by Universidad Carlos III de Madrid through “Proyecto JOVENES PPIT2025” - 2025/00831/001.
