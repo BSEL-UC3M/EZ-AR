@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AppInstaller
+	Uri="file:///C:/Users/javib/Desktop/EZ-AR-Build/EZ-AR_arm64.appinstaller"
+	Version="10.25.18.0" xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2">
+	<MainPackage
+		Name="EZ-AR"
+		Version="10.25.18.0"
+		Publisher="CN=Alicia Pose"
+		Uri="file:///C:/Users/javib/Desktop/EZ-AR-Build/EZ-AR_10.25.18.0_ARM64_Test/EZ-AR_10.25.18.0_ARM64.msix"
+		ProcessorArchitecture="arm64" />
+	<Dependencies>
+		<Package
+			Name="Microsoft.VCLibs.140.00"
+			Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US"
+			ProcessorArchitecture="arm64"
+			Uri="file:///C:/Users/javib/Desktop/EZ-AR-Build/EZ-AR_10.25.18.0_ARM64_Test/Dependencies/ARM64/Microsoft.VCLibs.ARM64.14.00.appx"
+			Version="14.0.33519.0" />
+	</Dependencies>
+	<UpdateSettings>
+		<OnLaunch
+			HoursBetweenUpdateChecks="0" />
+	</UpdateSettings>
+</AppInstaller>
