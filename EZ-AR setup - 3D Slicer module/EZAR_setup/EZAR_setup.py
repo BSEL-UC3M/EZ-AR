@@ -39,10 +39,10 @@ class EZAR_setup(ScriptedLoadableModule, VTKObservationMixin):
 
     def __init__(self, parent):
         ScriptedLoadableModule.__init__(self, parent)
-        self.parent.title = "EZAR_setup"  # TODO: make this more human readable by adding spaces
-        self.parent.categories = ["AR"]  # TODO: set categories (folders where the module shows up in the module selector)
-        self.parent.dependencies = []  # TODO: add here list of module names that this module requires
-        self.parent.contributors = ["Alicia Pose Díez de la Lastra and Gemma Arce Alonso (UC3M)"]  # TODO: replace with "Firstname Lastname (Organization)"
+        self.parent.title = "EZAR_setup"
+        self.parent.categories = ["AR"]
+        self.parent.dependencies = []
+        self.parent.contributors = ["Alicia Pose Díez de la Lastra (UC3M)"]
         # TODO: update with short description of the module and a link to online module documentation
         self.parent.helpText = """
 App para complementar la app universal de HoloLens 2 que empezó Gemma.
@@ -145,34 +145,40 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.isRotationSliderWidget.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
         self.ui.savePos_Button.connect("clicked(bool)", self.onSavePosButton)
         self.ui.resetPos_Button.connect("clicked(bool)", self.onResetPosButton)
-        ### CUSTOMIZABLE PARAMETERS
-        self.ui.ModelToCustomize_InputSelector.connect('currentIndexChanged(int)', self.onModelForCustimizationSelected)
+        ### CUSTOMIZABLE AND SAVE PARAMETERS
+        self.ui.ModelToCustomize_InputSelector.connect('currentIndexChanged(int)', self.onModelForCustomizationSelected)
         self.ui.ModelName_LineEdit.connect('textChanged(QString)', self.onModelNameChanged)
         self.ui.ColorPickerButton.connect("colorChanged(QColor)", self.onChangeColorClicked)
-        self.ui.GDriveURL_LineEdit.connect('textChanged(QString)', self.onURLchanged)
-        self.ui.SaveParameters_Button.connect("clicked(bool)", self.onSaveParametersClicked)
-
-        ### SAVE DATA
+        
         self.ui.savingPath.connect('directorySelected(QString)', self.onSaveDirectoryChanged)
         self.ui.SaveData_Button.connect("clicked(bool)", self.onSaveDataButtonClicked)
 
+        ### CONFIGURATION FILE
+        self.ui.GDriveURL_LineEdit.connect('textChanged(QString)', self.onURLchanged)
+        self.ui.ModelForGDrive_InputSelector.currentIndexChanged.connect(self.onModelForGDriveURLSelected)
+        self.ui.LoadFromGDrive_RadioButton.connect('clicked(bool)', self.onLoadModelsFromGDrive)
+        self.ui.LoadFromLocal_RadioButton.connect('clicked(bool)', self.onLoadModelsFromLocalStorage)
+        self.ui.SaveConfigFile_Button.connect('clicked(bool)', self.onSaveConfigFileClicked)
+        
 
         ### Collapse collapsible buttons and enable/unable buttons of interest
         self.ui.Initialization_CollapsibleButton.collapsed = False
         self.ui.Models_CollapsibleButton.collapsed = True
-        #self.ui.Models_CollapsibleButton.enabled = False ##################################################################################### DESCOMENTAR TODOS LOS enabled = False después de hacer la figura del paper ############################################################################################
-        #self.ui.FinishAndCenter_Button.enabled = False
-        #self.ui.RemoveSelectedModel_Button.enabled = False
+        self.ui.Models_CollapsibleButton.enabled = False
+        self.ui.FinishAndCenter_Button.enabled = False
+        self.ui.RemoveSelectedModel_Button.enabled = False
         self.ui.Positioning_CollapsibleButton.collapsed = True
-        #self.ui.Positioning_CollapsibleButton.enabled = False
-        self.ui.Customize_CollapsibleButton.collapsed = True
-        #self.ui.Customize_CollapsibleButton.enabled = False
-        self.ui.Save_CollapsibleButton.collapsed = True
-        #self.ui.Save_CollapsibleButton.enabled = False
+        self.ui.Positioning_CollapsibleButton.enabled = False
+        self.ui.CustomizeAndSave_CollapsibleButton.collapsed = True
+        self.ui.CustomizeAndSave_CollapsibleButton.enabled = False
+        self.ui.SaveConfigFile_CollapsibleButton.collapsed = True
+        self.ui.SaveConfigFile_CollapsibleButton.enabled = False
+        self.ui.GDriveConfig_CollapsibleButton.collapsed = False
+        self.ui.GDriveConfig_CollapsibleButton.enabled = True
 
         # Make sure parameter node is initialized (needed for module reload)
         self.initializeParameterNode()
-        self.initializeGUI()      
+        self.initializeGUI()             
        
 
         # Layout setup
@@ -449,6 +455,7 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.arrayOfModels.append(modelNode.GetName())           
 
         self.ui.ModelToCustomize_InputSelector.addItems(self.arrayOfModels)
+        self.ui.ModelForGDrive_InputSelector.addItems(self.arrayOfModels)
 
     def addModelToList(self, model_name):
         """
@@ -458,8 +465,8 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     def onSavePosButton(self):
         self.ui.Positioning_CollapsibleButton.collapsed = True
         self.ui.Positioning_CollapsibleButton.enabled = False
-        self.ui.Save_CollapsibleButton.collapsed = False
-        self.ui.Save_CollapsibleButton.enabled = True
+        self.ui.CustomizeAndSave_CollapsibleButton.collapsed = False
+        self.ui.CustomizeAndSave_CollapsibleButton.enabled = True
 
     def onResetPosButton(self):
         """
@@ -479,7 +486,7 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.updateGUIFromParameterNode()
         self.logic.updateTransformFromParameterNode()
 
-    def onModelForCustimizationSelected(self, selectedNodeNumber):
+    def onModelForCustomizationSelected(self, selectedNodeNumber):
         '''
         This method is called when a new model is selected in the COLORS menu
         '''   
@@ -502,38 +509,81 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 
         self.logic.ChangeColorOfSelectedModel(selectedColor)
 
-    def onSaveParametersClicked(self):
+    def onSaveDataButtonClicked(self):
+        """
+		Run processing when user clicks "Save Data" button.
+		"""
         self.logic.SaveColors()
         modelsOK = 0
         for i, model_name in enumerate(self.logic.MODELS_DICT.keys()):
                 modelNode = self.logic.MODELS_DICT[model_name]["node"]
                 modelName = modelNode.GetAttribute("Name")
-                modelColor = modelNode.GetAttribute("Color")
-                modelURL = modelNode.GetAttribute("URL")
-                if (modelName and modelColor and modelURL):
-                    modelsOK += 1                    
+                modelColor = modelNode.GetAttribute("Color")                
+                if (modelName and modelColor):
+                    modelsOK += 1
                 else:                    
-                    print("Some data is missing in the node: " + modelNode.GetName())
-                    self.ui.SaveParametersWarning_Label.text = "Some data is missing in the node: " + modelNode.GetName()
+                    print("The customized name of: " + modelNode.GetName() + "is missing")
+                    self.ui.SaveParametersWarning_Label.text = "The customized name of: " + modelNode.GetName() + " is missing"
                     
-                    
+                 
 
         if (modelsOK == len(self.logic.MODELS_DICT)): # if all models are ok, then procceed
-            self.ui.Positioning_CollapsibleButton.enabled = False
-            self.ui.Positioning_CollapsibleButton.collapsed = True
-            self.ui.Customize_CollapsibleButton.enabled = False
-            self.ui.Customize_CollapsibleButton.collapsed = True
-            self.ui.Save_CollapsibleButton.collapsed = True
-            self.ui.Save_CollapsibleButton.enabled = False
-            
-            ## Save the configuration (json) file in the saving directory
-            # Get the Save Directory from slicer settings
-            settings = slicer.app.userSettings()
-            save_folder_path = settings.value(self.logic.SAVING_DIRECTORY)
-            self.logic.CreateJSONfileWithModelsInfo(save_folder_path)
-            self.ui.SaveParametersWarning_Label.text = "The configuration file has been correctly saved in " + save_folder_path + ".\nUpload this file to your Google Drive, set it's accesibility to ""Anyone with the link"" and copy its sharing link.\nThen, paste it inside ""Configuration file url.txt"". This file can be accessed through the Windows Device Portal for Microsoft HoloLens 2 at System > File Explorer > Local App Data > EZ-AR > LocalState > Configuration file url.txt"
+            # Change model names
+            for i, model_name in enumerate(self.logic.MODELS_DICT.keys()):
+                modelNode = self.logic.MODELS_DICT[model_name]["node"]
+                modelName = modelNode.GetAttribute("Name")
+                self.ui.SaveParametersWarning_Label.text = "" # Clean warning text
+
+            self.updateParameterNodeFromGUI()
+
+            with slicer.util.tryWithErrorDisplay("Failed to compute results.", waitCursor=True):
+                # Compute output
+                save_folder_path = self.logic.SaveData()
+                # Update GUI
+                self.ui.SaveParametersWarning_Label.setText("All files have been saved in:\n" + save_folder_path + 'at ' + time.strftime("%H:%M:%S"))
+                self.ui.SaveData_Button.enabled = False
+                self.ui.SaveConfigFile_CollapsibleButton.collapsed = False
+                self.ui.SaveConfigFile_CollapsibleButton.enabled = True
+                self.ui.CustomizeAndSave_CollapsibleButton.enabled = False
+                self.ui.CustomizeAndSave_CollapsibleButton.collapsed = True
+                
+                
+    def onLoadModelsFromGDrive(self):
+        if self._parameterNode is None or self._updatingGUIFromParameterNode:
+            return
+        self._parameterNode.SetNodeReferenceID(self.logic.LOCAL_OR_GDRIVE, "GDrive")
+
+        self.ui.GDriveConfig_CollapsibleButton.enabled = True
+        self.ui.GDriveConfig_CollapsibleButton.collapsed = False
+        self.ui.GDriveConfig_CollapsibleButton.setStyleSheet("color: rgb(255,255,255);")
+
+
+    def onLoadModelsFromLocalStorage(self):
+        if self._parameterNode is None or self._updatingGUIFromParameterNode:
+            return
+        self._parameterNode.SetNodeReferenceID(self.logic.LOCAL_OR_GDRIVE, "Local")
+
+        self.ui.GDriveConfig_CollapsibleButton.enabled = False
+        self.ui.GDriveConfig_CollapsibleButton.collapsed = True
+        self.ui.GDriveConfig_CollapsibleButton.setStyleSheet("color: rgb(50,50,50);")
 
      
+    def onModelForGDriveURLSelected(self, selectedNodeNumber):
+        '''
+        This method is called when a new model is selected in the COLORS menu
+        '''   
+        
+        selectedNode = slicer.util.getFirstNodeByName(self.arrayOfModels[selectedNodeNumber])
+        if self._parameterNode is None or self._updatingGUIFromParameterNode:
+            return
+
+        if selectedNode is None:
+            self._parameterNode.SetNodeReferenceID(self.logic.MODEL_FOR_GDRIVEURL, "")
+        else:
+            self._parameterNode.SetNodeReferenceID(self.logic.MODEL_FOR_GDRIVEURL, selectedNode.GetID())
+
+        self.updateGUIFromParameterNode()
+    
     def onURLchanged(self, driveurl):
         '''
         This method is called when the User ID field is updated
@@ -548,25 +598,44 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		# update settings with the new directory
         settings = slicer.app.userSettings()
         settings.setValue(self.logic.SAVING_DIRECTORY, directory)
+
+    def onSaveConfigFileClicked(self):
+        '''
+        This method is called when Save Config File button is clicked
+        '''
+        parameterNode = self.logic.getParameterNode()
+        localOrGDrive = (self._parameterNode.GetNodeReference(self.logic.LOCAL_OR_GDRIVE))
+        if localOrGDrive == 'Local':
+            modelsOK = 0
+            for i, model_name in enumerate(self.logic.MODELS_DICT.keys()):
+                    modelNode = self.logic.MODELS_DICT[model_name]["node"]
+                    modelURL = modelNode.GetAttribute("URL")            
+                    if (modelURL):
+                        modelsOK += 1
+                    else:                    
+                        print("The URL of: " + modelNode.GetName() + " is missing")
+                        self.ui.SaveURL_Label.text = "The customized name of: " + modelNode.GetName() + " is missing"
+        else:
+            self._parameterNode.SetNodeReferenceID(self.logic.LOCAL_OR_GDRIVE, 'GDrive')
+            numOfModels = len(self.logic.MODELS_DICT)
+            modelsOK = numOfModels
+            print('Models OK')
+
+        if (modelsOK == len(self.logic.MODELS_DICT)): # if all models are ok, then procceed
+            ## Save the configuration (json) file in the saving directory
+            # Get the Save Directory from slicer settings
+            settings = slicer.app.userSettings()
+            save_folder_path = settings.value(self.logic.SAVING_DIRECTORY)
+            self.logic.CreateJSONfileWithModelsInfo(save_folder_path)
+            self.ui.GDriveConfig_CollapsibleButton.collapsed = True
+            self.ui.GDriveConfig_CollapsibleButton.enabled = False
+            self.ui.LoadFromLocal_RadioButton.enabled = False
+            self.ui.LoadFromGDrive_RadioButton.enabled = False
+            self.ui.LoadFromLocal_RadioButton.setStyleSheet("color: rgb(50,50,50);")
+            self.ui.LoadFromGDrive_RadioButton.setStyleSheet("color: rgb(50,50,50);")
+            self.ui.SaveURL_Label.text = "The configuration file has been correctly saved in " + save_folder_path
+
         
-            
-    def onSaveDataButtonClicked(self):
-        """
-		Run processing when user clicks "Save Data" button.
-		"""
-        self.updateParameterNodeFromGUI()
-        with slicer.util.tryWithErrorDisplay("Failed to compute results.", waitCursor=True):
-
-				# Compute output
-                save_folder_path = self.logic.SaveData()
-                # Update GUI 
-                self.ui.filesSavedLabel.setText("All files have been saved in:\n" + save_folder_path + 'Models saved at ' + time.strftime("%H:%M:%S"))
-                self.ui.SaveData_Button.enabled = False
-                self.ui.Customize_CollapsibleButton.collapsed = False
-                self.ui.Customize_CollapsibleButton.enabled = True
-                
-           
-
     #
 	# Parameter node and GUI interaction
 	# 
@@ -614,7 +683,8 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
 		# Make sure GUI changes do not call updateParameterNodeFromGUI (it could cause infinite loop)
         self._updatingGUIFromParameterNode = True
-		
+
+        		
 		### if the qr code size is set
         if (self._parameterNode.GetParameter(self.logic.QR_MODEL_NEW_SIZE)):
 			# update the qr size spin box
@@ -654,18 +724,20 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             qcolor = qt.QColor(current_color[0] * 255, current_color[1] * 255, current_color[2] * 255)
             self.ui.ColorPickerButton.setColor(qcolor) 
 
-            url = selectedModel.GetAttribute("URL")
-            if (url is None):
-                self.ui.GDriveURL_LineEdit.text = ""
-            else:
-                self.ui.GDriveURL_LineEdit.text = url
-
             name = selectedModel.GetAttribute("Name")
             if (name is None):
                 self.ui.ModelName_LineEdit.text = ""
             else:
                 self.ui.ModelName_LineEdit.text = name
-            
+
+        ### if a new model is selected for Config File URL generation
+        if(self._parameterNode.GetNodeReferenceID(self.logic.MODEL_FOR_GDRIVEURL)):
+            selectedModel = (self._parameterNode.GetNodeReference(self.logic.MODEL_FOR_GDRIVEURL))
+            url = selectedModel.GetAttribute("URL")
+            if (url is None):
+                self.ui.GDriveURL_LineEdit.text = ""
+            else:
+                self.ui.GDriveURL_LineEdit.text = url
 
 		
         ### All the GUI updates are done
@@ -690,6 +762,7 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._parameterNode.SetParameter(self.logic.ROTATION_LR_LEVEL, str(self.ui.lrRotationSliderWidget.value))
         self._parameterNode.SetParameter(self.logic.ROTATION_PA_LEVEL, str(self.ui.paRotationSliderWidget.value))
         self._parameterNode.SetParameter(self.logic.ROTATION_IS_LEVEL, str(self.ui.isRotationSliderWidget.value))
+
         self.logic.updateTransformFromParameterNode()
 
         self._parameterNode.EndModify(wasModified)
@@ -741,8 +814,11 @@ class EZAR_setupLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
     CENTER_MODELS_TRANSFORM = 'CenterModels_T'
     # Customization info
     MODEL_FOR_CUSTOMIZATION = 'Customize this model'
+    MODEL_FOR_GDRIVEURL = 'Model URL in Google Drive'
     # Saving path
     SAVING_DIRECTORY = 'savingPath'
+    # Saving Config file modality
+    LOCAL_OR_GDRIVE = 'Local or GDrive'
 
     def __init__(self):
         """
@@ -822,6 +898,10 @@ class EZAR_setupLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
         # Set Rotate IS
         if not parameterNode.GetParameter(self.ROTATION_IS_LEVEL):
             parameterNode.SetParameter(self.ROTATION_IS_LEVEL, "0.0")
+
+        # Set Config file configuration
+        if not parameterNode.GetParameter(self.LOCAL_OR_GDRIVE):
+            parameterNode.SetParameter(self.LOCAL_OR_GDRIVE, "GDrive")
                                 
         pass
     
@@ -916,6 +996,7 @@ class EZAR_setupLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
       else:
         print("Model already loaded.")
+        self.ui.ErrorInMaxNumOfModels_Label.text = "Model already loaded"
         return None
 
     def scaleQRModel(self, model, initialSize, newSize):
@@ -1061,7 +1142,8 @@ class EZAR_setupLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
             # make a copy of the model and apply the transforms
             modelNode_copy,hardened_transform = self.copyAndHardenModel(modelNode)
             # save model
-            file_name = "{}_registered.obj".format(model_name.split(".")[0])      
+            modelName = modelNode.GetAttribute("Name")
+            file_name = "{}.obj".format(modelName.split(".")[0])      
             path_aux = os.path.join(save_folder_path, file_name)
             slicer.util.saveNode(modelNode_copy, path_aux)
             # undo transforms in model
@@ -1205,13 +1287,14 @@ class EZAR_setupLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
         parameterNode = self.getParameterNode()
         selectedModelNode = parameterNode.GetNodeReference(self.MODEL_FOR_CUSTOMIZATION)
         selectedModelNode.SetAttribute("Name", modelName)
+        selectedModelNode.SetAttribute("URL", "")
 
     def ChangeGDriveURLofSelectedModel(self, driveurl):
         """
 		Change google drive url of the selected model and add it as attribute.
 		"""
         parameterNode = self.getParameterNode()
-        selectedModelNode = parameterNode.GetNodeReference(self.MODEL_FOR_CUSTOMIZATION)
+        selectedModelNode = parameterNode.GetNodeReference(self.MODEL_FOR_GDRIVEURL)
         selectedModelNode.SetAttribute("URL", driveurl)
 
     def SaveData(self):
@@ -1261,8 +1344,11 @@ class EZAR_setupLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
         #modelsTransformNode = parameterNode.GetNodeReference(self.MODELS_TRANSFORM)
         #fromModelToMarkerTransformArray = self.GetArrayFromTransform(self.finalTransform)
 
+        ### Will the models be saved locally or via Google Drive?
+        localOrGDrive = parameterNode.GetNodeReference(self.LOCAL_OR_GDRIVE)
+
         ### CREATE JSON FILE
-        json_path = os.path.join(save_folder_path, 'config_file.json')
+        json_path = os.path.join(save_folder_path, 'ConfigurationFile.json')
         with open(json_path, 'w') as json_file:
             json_data = {}  # Create a dictionary to store all lines
 
@@ -1270,15 +1356,19 @@ class EZAR_setupLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
             #json_data["model_position_with_respect_to_qr_code"] = fromModelToMarkerTransformArray ## We are not saving the transform anymore
             # Save the selected AR marker option (either QR or Vuforia)
             ar_marker_selected = parameterNode.GetParameter(self.AR_MARKER_SELECTED)
-            tracking_option = {"tracking_option": ar_marker_selected}
-            json_data.update(tracking_option)
+            json_data["tracking_option"] = ar_marker_selected
             # Save models intrinsic parameters (name, color and url) into the json file
             for i, model_name in enumerate(self.MODELS_DICT.keys()):
                 modelNode = self.MODELS_DICT[model_name]["node"]
                 modelName = modelNode.GetAttribute("Name")
                 modelColor = modelNode.GetAttribute("Color")
-                modelURL = modelNode.GetAttribute("URL")
-                downloadLink = self.DirectDownloadLinkGenerator(modelURL)
+                if (localOrGDrive == "GDrive"): # If the models are uploaded to GDrive, find their URL
+                    modelURL = modelNode.GetAttribute("URL")
+                    downloadLink = self.DirectDownloadLinkGenerator(modelURL)
+                else: # If the models are uploaded locally, create a fake text to place in the JSON file within the URL category to prevent crashes in the app
+                    modelURL = "ModelURL"
+                    downloadLink = "ThisIsAnAuxNonSenseTextDontErase"    
+
                 if (modelName and modelColor and modelURL):
                     # Create dictionary entries for each model
                     model_data = {
@@ -1289,7 +1379,6 @@ class EZAR_setupLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
                     json_data.update(model_data)
                 else:
                     print("Some data is missing in the node: " + modelNode.GetName())
-                    json_file.close()  # Close the file
 
             # Fill out the remaining entries (up to MAX_NUMBER_OF_MODELS) with empty data
             maxNumOfModels = int(parameterNode.GetParameter(self.MAX_NUMBER_OF_MODELS))
