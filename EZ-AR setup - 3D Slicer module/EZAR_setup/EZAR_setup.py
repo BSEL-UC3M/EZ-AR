@@ -540,7 +540,7 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 # Compute output
                 save_folder_path = self.logic.SaveData()
                 # Update GUI
-                self.ui.SaveParametersWarning_Label.setText("All files have been saved in:\n" + save_folder_path + 'at ' + time.strftime("%H:%M:%S"))
+                self.ui.SaveParametersWarning_Label.setText("All files have been saved in:\n" + save_folder_path + ' at ' + time.strftime("%H:%M:%S"))
                 self.ui.SaveData_Button.enabled = False
                 self.ui.SaveConfigFile_CollapsibleButton.collapsed = False
                 self.ui.SaveConfigFile_CollapsibleButton.enabled = True
@@ -555,7 +555,7 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         self.ui.GDriveConfig_CollapsibleButton.enabled = True
         self.ui.GDriveConfig_CollapsibleButton.collapsed = False
-        self.ui.GDriveConfig_CollapsibleButton.setStyleSheet("color: rgb(255,255,255);")
+        self.ui.GDriveConfig_CollapsibleButton.setStyleSheet("color: rgb(0,0,0);")#("color: rgb(255,255,255);")
 
 
     def onLoadModelsFromLocalStorage(self):
@@ -565,7 +565,7 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         self.ui.GDriveConfig_CollapsibleButton.enabled = False
         self.ui.GDriveConfig_CollapsibleButton.collapsed = True
-        self.ui.GDriveConfig_CollapsibleButton.setStyleSheet("color: rgb(50,50,50);")
+        self.ui.GDriveConfig_CollapsibleButton.setStyleSheet("color: rgb(255,255,255);")#("color: rgb(50,50,50);")
 
      
     def onModelForGDriveURLSelected(self, selectedNodeNumber):
@@ -631,9 +631,15 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.ui.GDriveConfig_CollapsibleButton.enabled = False
             self.ui.LoadFromLocal_RadioButton.enabled = False
             self.ui.LoadFromGDrive_RadioButton.enabled = False
-            self.ui.LoadFromLocal_RadioButton.setStyleSheet("color: rgb(50,50,50);")
-            self.ui.LoadFromGDrive_RadioButton.setStyleSheet("color: rgb(50,50,50);")
-            self.ui.SaveURL_Label.text = "The configuration file has been correctly saved in " + save_folder_path
+            self.ui.LoadFromLocal_RadioButton.setStyleSheet("color: rgb(255,255,255);")#("color: rgb(50,50,50);")
+            self.ui.LoadFromGDrive_RadioButton.setStyleSheet("color: rgb(255,255,255);")#("color: rgb(50,50,50);")
+
+            if localOrGDrive == 'Local':
+                furtherInstructions = '\nGo to the Windows Device Portal for Microsfot HoloLens 2 and upload this file to \nSystem > Local App Data > EZ-AR > LocalState > ConfigurationFiles.'
+            else:
+                furtherInstructions = '\nUpload this file to your Google Drive, set it''s accesibility to Anyone with the link and copy its sharing link. \nThen, paste it inside Configuration file url.txt. This file can be accessed through the Windows Device Portal for Microsoft HoloLens 2 at \nSystem > Local App Data > EZ-AR > LocalState > Configuration file url.txt.'
+            
+            self.ui.SaveURL_Label.text = "The configuration file has been correctly saved in " + save_folder_path + furtherInstructions
 
         
     #
