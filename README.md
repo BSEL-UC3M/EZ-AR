@@ -1,4 +1,4 @@
-# EZ-AR: A universal AR application for multi-model visualization and real-time tracking in healthcare settings
+# EZ-AR: An accessible AR application for multiple model visualization and real-time tracking in healthcare settings
 This repository has been created by Alicia Pose Díez de la Lastra, from Universidad Carlos III de Madrid.
 
 ## 📝 Project Overview
