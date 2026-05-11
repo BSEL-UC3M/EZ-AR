@@ -604,8 +604,8 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         This method is called when Save Config File button is clicked
         '''
         parameterNode = self.logic.getParameterNode()
-        localOrGDrive = (self._parameterNode.GetNodeReference(self.logic.LOCAL_OR_GDRIVE))
-        if localOrGDrive == 'Local':
+        localOrGDrive = parameterNode.GetNodeReferenceID(self.logic.LOCAL_OR_GDRIVE)
+        if localOrGDrive == 'GDrive':
             modelsOK = 0
             for i, model_name in enumerate(self.logic.MODELS_DICT.keys()):
                     modelNode = self.logic.MODELS_DICT[model_name]["node"]
@@ -616,7 +616,6 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                         print("The URL of: " + modelNode.GetName() + " is missing")
                         self.ui.SaveURL_Label.text = "The customized name of: " + modelNode.GetName() + " is missing"
         else:
-            self._parameterNode.SetNodeReferenceID(self.logic.LOCAL_OR_GDRIVE, 'GDrive')
             numOfModels = len(self.logic.MODELS_DICT)
             modelsOK = numOfModels
             print('Models OK')
@@ -633,9 +632,8 @@ class EZAR_setupWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.ui.LoadFromGDrive_RadioButton.enabled = False
             self.ui.LoadFromLocal_RadioButton.setStyleSheet("color: rgb(255,255,255);")#("color: rgb(50,50,50);")
             self.ui.LoadFromGDrive_RadioButton.setStyleSheet("color: rgb(255,255,255);")#("color: rgb(50,50,50);")
-
             if localOrGDrive == 'Local':
-                furtherInstructions = '\nGo to the Windows Device Portal for Microsfot HoloLens 2 and upload this file to \nSystem > Local App Data > EZ-AR > LocalState > ConfigurationFiles.'
+                furtherInstructions = '\nGo to the Windows Device Portal for Microsoft HoloLens 2 and upload this file to \nSystem > Local App Data > EZ-AR > LocalState > ConfigFiles.'
             else:
                 furtherInstructions = '\nUpload this file to your Google Drive, set it''s accesibility to Anyone with the link and copy its sharing link. \nThen, paste it inside Configuration file url.txt. This file can be accessed through the Windows Device Portal for Microsoft HoloLens 2 at \nSystem > Local App Data > EZ-AR > LocalState > Configuration file url.txt.'
             
@@ -907,7 +905,7 @@ class EZAR_setupLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
         # Set Config file configuration
         if not parameterNode.GetParameter(self.LOCAL_OR_GDRIVE):
-            parameterNode.SetParameter(self.LOCAL_OR_GDRIVE, "GDrive")
+            parameterNode.SetNodeReferenceID(self.LOCAL_OR_GDRIVE, "GDrive")
                                 
         pass
     
@@ -1351,7 +1349,7 @@ class EZAR_setupLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
         #fromModelToMarkerTransformArray = self.GetArrayFromTransform(self.finalTransform)
 
         ### Will the models be saved locally or via Google Drive?
-        localOrGDrive = parameterNode.GetNodeReference(self.LOCAL_OR_GDRIVE)
+        localOrGDrive = parameterNode.GetNodeReferenceID(self.LOCAL_OR_GDRIVE)
 
         ### CREATE JSON FILE
         json_path = os.path.join(save_folder_path, 'ConfigurationFile.json')
