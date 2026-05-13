@@ -3,7 +3,7 @@
 ## How to download and install the app in your device
 To start, you must own a Microsoft HoloLens 2 headset configured in Developer Mode. Then, follow the steps below:
 1. Download this folder into the local storage of your computer.
-2. Turn on your HoloLens 2, connect to the same network as your PC and find its IP address. In [insert video Setup Instructions] you have an example on how to get it using the HoloRemoting app (min 02:35).
+2. Turn on your HoloLens 2, connect to the same network as your PC and find its IP address. In _SuppVideo-1_SetupInstructions.mp4_ (available at https://zenodo.org/records/20124571) you have an example on how to get it using the HoloRemoting app (min 02:35).
 3. Copy the IP addreess (shown in yellow) into a web browser in your PC. You will be asked to sign in with your HoloLens 2 user name and password. The Windows Device Portal will pop up for you.
 4. In the left hand side panel of the Windows Device Portal, click on Views > Apps. Within the Deploy Apps section, please click "Choose file" within the *Local storage* section:
 <p align="center"><img width="611" height="339" alt="image" src="https://github.com/user-attachments/assets/94e28672-011e-4536-be87-37906a36637d" />
@@ -14,7 +14,7 @@ To start, you must own a Microsoft HoloLens 2 headset configured in Developer Mo
 7. Your are all set!
 
 ## How to setup the app with your own 3D models
-Please, download the EZ-AR setup module in 3D Slicer (also provided in this repository) and follow the instructions provided in [insert video Setup Instructions] to load your own personalized 3D models.
+Please, download the EZ-AR setup module in 3D Slicer (also provided in this repository) and follow the instructions provided in _SuppVideo-1_SetupInstructions.mp4_ (available at https://zenodo.org/records/20124571) to load your own personalized 3D models.
 
 **NOTE:** Please, after loading for the first time any app that uses Vuforia tracking, please restart the app to complete the initialization process.
 
