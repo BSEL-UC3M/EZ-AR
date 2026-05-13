@@ -43,4 +43,4 @@ On the right side of the control panel, a set of interactive elements allows use
 - *Clear Memory* button: It erases all downloaded content from the device’s local storage. This feature is intended to facilitate the loading of a new configuration file, for instance, when switching to data from a different patient.
 
 ## Sample use cases
-You can see some sample use cases in the following video: [Insert URL Youtube video: Supp. Video 2: Sample Use Cases]
+You can see some sample use cases in the following video: https://www.youtube.com/watch?v=9TJHGmhLczc
