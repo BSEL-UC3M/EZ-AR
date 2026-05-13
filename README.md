@@ -34,7 +34,7 @@ The repository is organized as follows:
 
 ## 🚀 Installation and Usage
 
-Please, follow the instructions in the video SuppVideo-1_SeupInstruction.mp4 available at https://zenodo.org/records/18784073 to setup your own personalized AR app. In that repository you will also find a supplementary document with further instructions and details, as well as another video with sample use cases of the app.
+Please, follow the instructions in the video _SuppVideo-1_SetupInstruction.mp4_ available at https://zenodo.org/records/18784073 to setup your own personalized AR app. In that repository you will also find a supplementary document with further instructions and details, as well as another video with sample use cases of the app.
 
 ## 📧 Contact
 
