@@ -16,4 +16,4 @@
 <p align="center"><img width="4316" height="2457" alt="3DSlicerModule_Initialization" src="https://github.com/user-attachments/assets/a8da7d5a-e353-44db-bd2a-6c83bfc00bec" />
 
 ## Create your configuration file with information about your personalized 3D models
-Please, follow the instructions provided in the video: [Insert video with setup instructions]
+Please, follow the instructions provided in the video _SuppVideo-1_SetupInstructions_ available at: https://zenodo.org/records/20124571.
